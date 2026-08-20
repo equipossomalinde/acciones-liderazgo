@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividades de Liderazgo Preventivo · Linde High Lift Chile</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  :root{
+    --lmh-red:#AA0020; --lmh-red-dk:#7E0018;
+    --forklift:#CB5023; --lmh-blue:#00558C; --lmh-blue-72:#468CC4;
+    --turquoise:#25A3BA; --green:#77B342; --yellow:#FFC72C;
+    --grey-dk:#6B6B6B; --grey-md:#A1A1A1; --grey-lt:#D2D2D2; --grey-pale:#E9E9E9;
+    --bg:#F4F4F4; --card:#FFFFFF; --ink:#1E1E1E; --muted:#6B6B6B; --line:#E0E0E0;
+    --ok:#77B342; --warn:#E0A400; --bad:#AA0020;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+
+  header{background:linear-gradient(120deg,var(--lmh-red-dk) 0%,var(--lmh-red) 55%,#C40025 100%);color:#fff;padding:18px 28px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .brand{display:flex;flex-direction:column;gap:2px}
+  .brand h1{font-size:20px;font-weight:600;letter-spacing:.3px}
+  .brand .tag{font-size:11px;text-transform:uppercase;letter-spacing:2px;opacity:.85}
+  .hd-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .src-badge{font-size:11px;padding:5px 12px;border-radius:20px;font-weight:600;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+  .src-badge.live{background:rgba(119,179,66,.3);color:#D8F0BE}
+  .src-badge.cache{background:rgba(70,140,196,.3);color:#CFE6F7}
+  .src-badge.fallback{background:rgba(255,199,44,.28);color:#FFE9A8}
+  .dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  button{cursor:pointer;font-family:inherit}
+  .btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;padding:7px 14px;border-radius:8px;font-size:12.5px;transition:background .15s}
+  .btn:hover{background:rgba(255,255,255,.28)}
+  .btn.word{background:#fff;color:var(--lmh-red);border:none;font-weight:600}
+  .btn.word:hover{background:var(--grey-pale)}
+  .last-upd{font-size:11px;opacity:.8}
+
+  main{max-width:1340px;margin:0 auto;padding:20px 28px 60px}
+
+  /* ---------- barra de filtros ---------- */
+  .filters{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px}
+  .fl{display:flex;flex-direction:column;gap:4px}
+  .fl label{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600}
+  .fl select,.fl input{border:1px solid var(--grey-lt);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;background:#fff;color:var(--ink);min-width:130px}
+  .fl input{min-width:200px}
+  .fl.grow{flex:1;min-width:200px}
+  .fl.grow input{width:100%}
+  .fl-reset{margin-left:auto}
+  .btn-ghost{background:var(--grey-pale);border:1px solid var(--grey-lt);color:var(--ink);padding:8px 14px;border-radius:8px;font-size:12.5px}
+  .btn-ghost:hover{background:#DFDFDF}
+
+  /* ---------- scoreboard ---------- */
+  .scoreboard{background:#1E1E1E;border-radius:14px;border-top:5px solid var(--lmh-red);color:#fff;padding:22px 26px;display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center;margin-bottom:22px;position:relative;overflow:hidden}
+  .scoreboard::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent 0 26px,rgba(255,199,44,.05) 26px 52px)}
+  .sb-main{position:relative;text-align:center;padding-right:26px;border-right:1px solid rgba(255,255,255,.15)}
+  .sb-main .big{font-size:70px;font-weight:800;line-height:1;color:var(--green);font-variant-numeric:tabular-nums;text-shadow:0 0 34px rgba(119,179,66,.4)}
+  .sb-main .lbl{font-size:11px;text-transform:uppercase;letter-spacing:2.5px;opacity:.75;margin-top:8px}
+  .sb-grid{position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px}
+  .sb-item .v{font-size:25px;font-weight:700;font-variant-numeric:tabular-nums}
+  .sb-item .k{font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;opacity:.62;margin-top:2px;line-height:1.3}
+
+  h2.sec{font-size:12px;text-transform:uppercase;letter-spacing:2.2px;color:var(--lmh-red);margin:26px 0 12px;display:flex;align-items:center;gap:10px;font-weight:700}
+  h2.sec::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--lmh-red) 0,var(--grey-pale) 120px)}
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+  .panel h3{font-size:13.5px;font-weight:600;margin-bottom:12px;color:#1E1E1E;padding-left:10px;border-left:3px solid var(--lmh-red)}
+  .panel .ch{position:relative;height:300px}
+
+  /* ---------- mapa ---------- */
+  .map-wrap{display:grid;grid-template-columns:340px 1fr;gap:16px}
+  .map-panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;justify-content:center}
+  .map-panel svg{max-height:560px;width:100%}
+  .chile-shape{fill:#EDEDED;stroke:var(--grey-lt);stroke-width:1}
+  .mk{cursor:pointer}
+  .mk circle.pt{fill:var(--lmh-red);stroke:#fff;stroke-width:2;transition:r .15s}
+  .mk.active circle.pt{fill:var(--lmh-blue)}
+  .mk circle.halo{fill:var(--lmh-red);opacity:.18}
+  .mk.active circle.halo{fill:var(--lmh-blue);opacity:.22}
+  .mk text{font-size:13px;font-weight:600;fill:#1E1E1E}
+  .mk text.n{font-size:10.5px;font-weight:400;fill:var(--muted)}
+  .mk polyline{stroke:var(--grey-lt);stroke-width:1;fill:none}
+  .mk:hover polyline,.mk.active polyline{stroke:var(--grey-md)}
+  .detail{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+  .detail h3{font-size:16px;font-weight:700;color:var(--lmh-red);margin-bottom:2px}
+  .detail .hint{font-size:12px;color:var(--muted);margin-bottom:12px}
+  .d-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:12px}
+  .d-item{background:#FAFAFA;border:1px solid var(--grey-pale);border-radius:8px;padding:10px 12px}
+  .d-item .dv{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+  .d-item .dk{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:2px;line-height:1.3}
+  .d-empty{color:var(--grey-md);font-style:italic;padding:30px 0;text-align:center}
+  .d-list{font-size:12.5px}
+  .d-list .dl-t{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:4px 0 6px;font-weight:600}
+  .d-list .dl-row{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px dashed var(--line)}
+  .d-list .dl-row:last-child{border-bottom:none}
+  .d-list .dl-row b{color:var(--lmh-blue);font-weight:600}
+
+  /* ---------- tablas ---------- */
+  .tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .tbl-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .tbl-head .t-title{font-size:13.5px;font-weight:600}
+  .tbl-head .t-sub{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{background:#FAFAFA;text-align:left;padding:9px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1;cursor:pointer;user-select:none}
+  thead th.no-sort{cursor:default}
+  tbody td{padding:9px 14px;border-bottom:1px solid var(--grey-pale);vertical-align:top}
+  tbody tr:hover{background:#FBFBFB}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;background:var(--grey-pale);color:var(--grey-dk)}
+  .pill.b{background:rgba(0,85,140,.12);color:var(--lmh-blue)}
+  .bar-cell{display:flex;align-items:center;gap:8px}
+  .bar-cell .bar{height:8px;border-radius:4px;background:var(--lmh-blue-72);min-width:2px}
+  .row-blank{background:#FFFBEA}
+  .row-blank:hover{background:#FFF6D6}
+  .row-zero td{color:var(--grey-md)}
+  .name-cell{display:flex;align-items:center;gap:8px}
+  .name-edit{border:1px solid var(--grey-lt);border-radius:6px;padding:4px 7px;font-size:12.5px;font-family:inherit;width:150px}
+  .mini-btn{border:none;background:var(--lmh-blue);color:#fff;border-radius:6px;padding:4px 9px;font-size:11.5px;font-weight:600}
+  .mini-btn.g{background:var(--grey-pale);color:var(--grey-dk)}
+  .edit-ico{opacity:0;font-size:11px;color:var(--grey-md);cursor:pointer}
+  tr:hover .edit-ico{opacity:1}
+  .cargo-badge{font-size:11px;color:var(--muted)}
+  .det-scroll{max-height:520px;overflow:auto}
+  .det-row-sub{background:#FCFCFC;font-size:12.5px;color:var(--ink);line-height:1.5}
+  .det-row-sub .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:600;margin-right:6px}
+  .lnk{color:var(--lmh-blue);text-decoration:none;font-weight:600}
+  .lnk:hover{text-decoration:underline}
+  .expand{cursor:pointer;color:var(--lmh-blue);font-weight:700;user-select:none}
+
+  #err{display:none;background:#FBEDEA;border:1px solid #E8C2BB;color:#8C3A34;border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:13px;line-height:1.55}
+  footer{text-align:center;color:var(--muted);font-size:11.5px;padding:14px 0 30px}
+  @media(max-width:900px){ .map-wrap{grid-template-columns:1fr} .map-panel svg{max-height:420px} }
+  @media(max-width:760px){
+    .scoreboard{grid-template-columns:1fr}
+    .sb-main{border-right:none;border-bottom:1px solid rgba(255,255,255,.15);padding:0 0 18px}
+    main{padding:16px 14px 50px}
+    .grid2{grid-template-columns:1fr}
+    .filters{gap:10px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>Linde High Lift Chile S.A.</h1>
+    <span class="tag">Actividades de Liderazgo Preventivo · SSOMA</span>
+  </div>
+  <div class="hd-right">
+    <span class="src-badge fallback" id="srcBadge"><span class="dot"></span><span id="srcTxt">Cargando…</span></span>
+    <span class="last-upd" id="lastUpd"></span>
+    <button class="btn word" onclick="genWord()">⬇ Informe Word</button>
+    <button class="btn" onclick="loadAll()">↻ Actualizar</button>
+  </div>
+</header>
+
+<main>
+  <div id="err"></div>
+
+  <!-- filtros -->
+  <div class="filters">
+    <div class="fl">
+      <label for="fYear">Año</label>
+      <select id="fYear" onchange="applyFilters()"></select>
+    </div>
+    <div class="fl">
+      <label for="fMonth">Mes</label>
+      <select id="fMonth" onchange="applyFilters()">
+        <option value="">Todos</option>
+        <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+        <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+        <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+        <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+    </div>
+    <div class="fl">
+      <label for="fBranch">Sucursal</label>
+      <select id="fBranch" onchange="applyFilters()">
+        <option value="">Todas</option>
+      </select>
+    </div>
+    <div class="fl grow">
+      <label for="fSearch">Buscar en actividades</label>
+      <input id="fSearch" type="text" placeholder="persona, actividad, descripción…" oninput="renderDetail()">
+    </div>
+    <div class="fl-reset"><button class="btn-ghost" onclick="resetFilters()">Limpiar filtros</button></div>
+  </div>
+
+  <!-- scoreboard -->
+  <div class="scoreboard">
+    <div class="sb-main">
+      <div class="big" id="sbTotal">—</div>
+      <div class="lbl" id="sbTotalLbl">Actividades registradas</div>
+    </div>
+    <div class="sb-grid" id="sbGrid"></div>
+  </div>
+
+  <!-- mapa -->
+  <h2 class="sec">Resumen por sucursal</h2>
+  <div class="map-wrap">
+    <div class="map-panel"><svg id="chileMap" viewBox="0 0 330 645" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    <div class="detail">
+      <h3 id="dName">Sucursales Linde High Lift Chile</h3>
+      <div class="hint" id="dHint">Pasa el cursor sobre una sucursal en el mapa para ver su detalle</div>
+      <div class="d-grid" id="dGrid"><div class="d-empty">Selecciona una sucursal</div></div>
+      <div class="d-list" id="dList"></div>
+    </div>
+  </div>
+
+  <!-- gráficos -->
+  <h2 class="sec">Distribución de actividades</h2>
+  <div class="grid2">
+    <div class="panel"><h3>Actividades por sucursal</h3><div class="ch"><canvas id="chBranch"></canvas></div></div>
+    <div class="panel"><h3 id="chMonthTitle">Actividades por mes</h3><div class="ch"><canvas id="chMonth"></canvas></div></div>
+    <div class="panel"><h3>Tipo de actividad</h3><div class="ch"><canvas id="chType"></canvas></div></div>
+    <div class="panel"><h3>Colaboradores más activos (Top 10)</h3><div class="ch"><canvas id="chPeople"></canvas></div></div>
+  </div>
+
+  <!-- roster jefaturas -->
+  <h2 class="sec">Cumplimiento por cargo · Equipo de jefaturas</h2>
+  <div class="tbl-wrap">
+    <div class="tbl-head">
+      <div>
+        <div class="t-title">Actividades de liderazgo por cargo</div>
+        <div class="t-sub" id="rosterSub">—</div>
+      </div>
+      <div class="t-sub">Haz clic en el ✎ para editar o completar un nombre</div>
+    </div>
+    <div style="overflow:auto">
+      <table id="rosterTbl">
+        <thead><tr>
+          <th class="no-sort">Cargo</th>
+          <th class="no-sort">Nombre</th>
+          <th class="no-sort num">Actividades</th>
+          <th class="no-sort">Participación</th>
+          <th class="no-sort">Última actividad</th>
+        </tr></thead>
+        <tbody id="rosterBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- detalle -->
+  <h2 class="sec">Detalle de actividades</h2>
+  <div class="tbl-wrap">
+    <div class="tbl-head">
+      <div>
+        <div class="t-title">Registro de actividades</div>
+        <div class="t-sub" id="detSub">—</div>
+      </div>
+      <button class="btn-ghost" onclick="exportCsv()">⬇ Exportar CSV filtrado</button>
+    </div>
+    <div class="det-scroll">
+      <table id="detTbl">
+        <thead><tr>
+          <th data-k="fecha">Fecha</th>
+          <th data-k="sucursal">Sucursal</th>
+          <th data-k="nombre">Persona</th>
+          <th data-k="actividad">Actividad</th>
+          <th data-k="cat">Tipo</th>
+          <th class="no-sort">Detalle</th>
+        </tr></thead>
+        <tbody id="detBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>Linde High Lift Chile S.A. · Actividades de Liderazgo Preventivo SSOMA · <span id="footSrc"></span> · <b>v1</b></footer>
+</main>
+
+<script>
+/* ===================== CONFIGURACIÓN ===================== */
+/* URL de la planilla publicada como CSV (Archivo ▸ Compartir ▸ Publicar en la web ▸ CSV).
+   Para actualizar los datos del dashboard basta con que esta planilla se actualice. */
+const PUB_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7p721cJ0QsZvOciPxBsHD3keC5NvOKiMvLie22Xmjyiwv4nhm7zOfMEs7epD9ANB8qaRZvEPxDqOk/pub?gid=728799474&single=true&output=csv";
+const CACHE_KEY = "llp_csv_cache";
+const OVERRIDE_KEY = "llp_roster_overrides";
+
+/* ===================== LÓGICA (validada) ===================== */
+function norm(s){return String(s??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();}
+function parseCSV(text){
+  const rows=[]; let row=[],cur="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else{ if(c==='"')q=true; else if(c===","){row.push(cur);cur="";} else if(c==="\n"){row.push(cur);rows.push(row);row=[];cur="";} else if(c!=="\r") cur+=c; }
+  }
+  if(cur||row.length){row.push(cur);rows.push(row);}
+  return rows;
+}
+function parseFecha(s){
+  s=String(s??"").trim(); if(!s) return null;
+  const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if(!m) return null;
+  let mo=+m[1],da=+m[2],yr=+m[3];
+  if(yr<100) yr+=2000;
+  if(mo<1||mo>12||da<1||da>31) return null;
+  return {y:yr,m:mo,d:da};
+}
+const BRANCHES=[
+  {code:"ANF", name:"Antofagasta",  lat:23.65, lon:-70.40},
+  {code:"SCL", name:"Santiago",     lat:33.45, lon:-70.65},
+  {code:"MAT", name:"Matriz",       lat:33.45, lon:-70.65, offset:1},
+  {code:"CRC", name:"Curicó",       lat:34.98, lon:-71.24},
+  {code:"CCP", name:"Concepción",   lat:36.82, lon:-73.05},
+  {code:"PMC", name:"Puerto Montt", lat:41.47, lon:-72.94},
+];
+const BRANCH_BY_CODE={}; BRANCHES.forEach(b=>BRANCH_BY_CODE[b.code]=b);
+function branchName(code){ const b=BRANCH_BY_CODE[String(code||"").trim().toUpperCase()]; return b?b.name:(code||"—"); }
+
+const ROSTER_BASE=[
+  {cargo:"Gerente General",                         nombre:"Jaime Contardo",   match:["contardo"]},
+  {cargo:"Gerente Comercial",                       nombre:"Luis Troncoso",    match:["troncoso"]},
+  {cargo:"Gerente de Servicio al Cliente",          nombre:"Oscar Jacob",      match:["jacob"]},
+  {cargo:"Subgerente de Contabilidad",              nombre:"Pablo Añasco",     match:["anasco"]},
+  {cargo:"Subgerente Clientes",                     nombre:"Andres Diaz",      match:["diaz"]},
+  {cargo:"Subgerente de Finanzas",                  nombre:"Alejandra Jorquera",match:["jorquera"]},
+  {cargo:"Subgerente de Ventas",                    nombre:"Daniel Yamada",    match:["yamada"]},
+  {cargo:"Sub Gerente de Recursos Humanos",         nombre:"Cristian Quense",  match:["quense"]},
+  {cargo:"Jefe Nac. Seguridad, Salud y Medio Ambiente", nombre:"Juan Pino",    match:["pino"]},
+  {cargo:"Jefe de Personal y Remuneraciones",       nombre:"Natalia Sanchez",  match:["sanchez"]},
+  {cargo:"Jefe de Planificación",                   nombre:"Marcelo Hidalgo",  match:["marcelo","hidalgo"]},
+  {cargo:"Jefe de Informática",                     nombre:"Alejandro Aguilera",match:["aguilera"]},
+  {cargo:"Jefe de Adqui y Servicios Generales",     nombre:"Carlos Bastias",   match:["carlos","bastias"]},
+  {cargo:"Jefe de CD",                              nombre:"Carlos Jara",      match:["carlos","jara"]},
+  {cargo:"Controller",                              nombre:"Ignacio Roman",    match:["roman"]},
+  {cargo:"Encargado Facturación",                   nombre:"Fabian Orellana",  match:["orellana"]},
+  {cargo:"Jefe de Comercio Exterior",               nombre:"",                 match:[], blank:true},
+  {cargo:"Jefe Nacional de Operaciones",            nombre:"",                 match:[], blank:true},
+];
+function tokensFromName(name){ return norm(name).split(/\s+/).filter(Boolean); }
+function personMatchesTokens(nombreCsv, tokens){
+  if(!tokens||!tokens.length) return false;
+  const n=norm(nombreCsv);
+  return tokens.every(t=>n.includes(t));
+}
+/* aplica nombres editados/agregados guardados en el navegador */
+function getRoster(){
+  let ov={}; try{ ov=JSON.parse(localStorage.getItem(OVERRIDE_KEY)||"{}"); }catch(e){}
+  return ROSTER_BASE.map(rc=>{
+    const o=ov[rc.cargo];
+    if(o!==undefined && o!==null){
+      const nm=String(o).trim();
+      return {...rc, nombre:nm, match: nm?tokensFromName(nm):[], edited:true};
+    }
+    return {...rc};
+  });
+}
+function saveOverride(cargo, nombre){
+  let ov={}; try{ ov=JSON.parse(localStorage.getItem(OVERRIDE_KEY)||"{}"); }catch(e){}
+  ov[cargo]=nombre; localStorage.setItem(OVERRIDE_KEY, JSON.stringify(ov));
+}
+
+const CATS=[
+  {id:"pausa",         label:"Pausa activa",              color:"#A1A1A1", kw:["pausa activa"]},
+  {id:"reconocimiento",label:"Reconocimiento",            color:"#5D9130", kw:["reconocimiento"]},
+  {id:"induccion",     label:"Inducción",                 color:"#FFC72C", kw:["induc","indfuc","indicacion jose","indicacion "]},
+  {id:"caminata",      label:"Caminata de seguridad",     color:"#25A3BA", kw:["caminata"]},
+  {id:"charla",        label:"Charla / Conversación",     color:"#77B342", kw:["charla","conversacion","safety conversation","reflexion","reflexi"]},
+  {id:"capacitacion",  label:"Capacitación",              color:"#AA0020", kw:["capacitacion","curso","registro de capacitacion","art para","art ","encuesta","protocolo"]},
+  {id:"inspeccion",    label:"Inspección / Recorrido",    color:"#00558C", kw:["inspeccion","recorrido","revision","verificacion","control operacional","housekeeping","hoysekeeping","houseppeking","orden y limpieza","condiciones de","punto de encuentro"]},
+  {id:"reunion",       label:"Reunión",                   color:"#468CC4", kw:["reunion"]},
+  {id:"visita",        label:"Visita a cliente / terreno",color:"#CB5023", kw:["visita","vista "]},
+];
+const CAT_LABEL={}; const CAT_COLOR={}; CATS.forEach(c=>{CAT_LABEL[c.id]=c.label;CAT_COLOR[c.id]=c.color;});
+CAT_LABEL.otras="Otras"; CAT_COLOR.otras="#D2D2D2";
+function categorize(actividad, desc){
+  const t=norm(actividad)+" "+norm(desc);
+  for(const c of CATS){ if(c.kw.some(k=>t.includes(k))) return c.id; }
+  return "otras";
+}
+function toRecords(rows){
+  if(!rows||!rows.length) return [];
+  const head=rows[0].map(h=>norm(h));
+  const col=(frag)=>head.findIndex(h=>h.includes(norm(frag)));
+  const iNom=col("nombre"), iSuc=col("sucursal"), iAct=col("nombre actividad"),
+        iFec=col("fecha actividad"), iDes=col("descripcion"), iObs=col("observaciones"),
+        iImg=col("imagenes");
+  const out=[];
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r]; if(!row||row.every(c=>!String(c).trim())) continue;
+    const nombre=(row[iNom]||"").trim();
+    const code=(row[iSuc]||"").trim().toUpperCase();
+    if(!nombre && !code) continue;
+    const f=parseFecha(row[iFec]);
+    out.push({
+      nombre, code, sucursal:branchName(code),
+      actividad:(row[iAct]||"").trim(),
+      fecha:f, fechaTxt:(row[iFec]||"").trim(),
+      desc:(row[iDes]||"").trim(), obs:(row[iObs]||"").trim(),
+      img:(row[iImg]||"").trim(),
+      cat:categorize(row[iAct]||"", row[iDes]||""),
+    });
+  }
+  return out;
+}
+function sortKey(f){ return f? f.y*10000+f.m*100+f.d : 0; }
+
+/* ===================== ESTADO ===================== */
+let ALL=[];            // todos los registros
+let VIEW=[];           // registros filtrados (año/mes/sucursal)
+let AGG=null;          // agregación de VIEW
+let CHARTS_OK=true, charts={}, SRC="—";
+const MESES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const PALETTE=["#00558C","#25A3BA","#77B342","#FFC72C","#CB5023","#AA0020"];
+
+try{
+  Chart.register(ChartDataLabels);
+  Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+  Chart.defaults.color="#6B6B6B";
+  Chart.defaults.set('plugins.datalabels',{display:false});
+}catch(e){ CHARTS_OK=false; }
+window.addEventListener("error",ev=>{
+  const err=document.getElementById("err");
+  if(err){ err.innerHTML="<b>Error interno:</b> "+(ev.message||ev.error||"desconocido"); err.style.display="block"; }
+});
+
+function fmt(n){ return (n===null||n===undefined)?"—":Number(n).toLocaleString("es-CL"); }
+function makeChart(id,cfg){
+  if(!CHARTS_OK) return;
+  try{ if(charts[id]) charts[id].destroy(); charts[id]=new Chart(document.getElementById(id),cfg); }
+  catch(e){ console.error("Gráfico "+id,e); }
+}
+const DL_BAR={display:true,anchor:"end",align:"end",offset:-2,clamp:true,color:"#1E1E1E",font:{size:10,weight:"600"},formatter:v=>v>0?v:""};
+const DL_BARH={display:true,anchor:"end",align:"right",offset:2,clamp:true,color:"#1E1E1E",font:{size:10,weight:"600"},formatter:v=>v>0?v:""};
+const DL_DONUT={display:true,color:"#fff",font:{size:11,weight:"700"},formatter:v=>v>0?v:""};
+const commonOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}};
+
+/* ===================== AGREGACIÓN ===================== */
+function aggregate(recs, roster){
+  const perBranch={}; BRANCHES.forEach(b=>perBranch[b.code]=0);
+  const perMonth=new Array(12).fill(0);
+  const perYear={};
+  const perType={}; Object.keys(CAT_LABEL).forEach(k=>perType[k]=0);
+  const perPerson={};
+  let lastAll=null;
+  recs.forEach(x=>{
+    if(x.code in perBranch) perBranch[x.code]++;
+    if(x.fecha){ perMonth[x.fecha.m-1]++; perYear[x.fecha.y]=(perYear[x.fecha.y]||0)+1; }
+    perType[x.cat]=(perType[x.cat]||0)+1;
+    const key=x.nombre||"(sin nombre)";
+    if(!perPerson[key]) perPerson[key]={nombre:key,total:0,last:null,byBranch:{}};
+    const p=perPerson[key]; p.total++; p.byBranch[x.code]=(p.byBranch[x.code]||0)+1;
+    const k=sortKey(x.fecha);
+    if(x.fecha){ if(!p.last||k>p.last.key) p.last={key:k,txt:x.fechaTxt}; if(!lastAll||k>lastAll.key) lastAll={key:k,txt:x.fechaTxt}; }
+  });
+  const rosterAgg=roster.map(rc=>{
+    const tokens=rc.match&&rc.match.length?rc.match:tokensFromName(rc.nombre);
+    let total=0,last=null,byBranch={};
+    if(rc.nombre&&tokens.length){
+      recs.forEach(x=>{
+        if(personMatchesTokens(x.nombre,tokens)){
+          total++; byBranch[x.code]=(byBranch[x.code]||0)+1;
+          const k=sortKey(x.fecha);
+          if(x.fecha&&(!last||k>last.key)) last={key:k,txt:x.fechaTxt};
+        }
+      });
+    }
+    return {...rc,total,last,byBranch};
+  });
+  return {total:recs.length,perBranch,perMonth,perYear,perType,perPerson,rosterAgg,lastAll};
+}
+
+/* ===================== FILTROS ===================== */
+function currentFilters(){
+  return {
+    year:document.getElementById("fYear").value,
+    month:document.getElementById("fMonth").value,
+    branch:document.getElementById("fBranch").value,
+  };
+}
+function applyFilters(){
+  const f=currentFilters();
+  VIEW=ALL.filter(x=>{
+    if(f.branch && x.code!==f.branch) return false;
+    if(f.year){ if(!x.fecha||String(x.fecha.y)!==f.year) return false; }
+    if(f.month){ if(!x.fecha||String(x.fecha.m)!==f.month) return false; }
+    return true;
+  });
+  AGG=aggregate(VIEW, getRoster());
+  renderAll();
+}
+function resetFilters(){
+  const yrs=Object.keys(ALL.reduce((a,x)=>{if(x.fecha)a[x.fecha.y]=1;return a;},{})).sort();
+  document.getElementById("fYear").value = yrs.length? yrs[yrs.length-1] : "";
+  document.getElementById("fMonth").value="";
+  document.getElementById("fBranch").value="";
+  document.getElementById("fSearch").value="";
+  applyFilters();
+}
+
+/* ===================== RENDER ===================== */
+function periodLabel(){
+  const f=currentFilters();
+  let p=[];
+  if(f.month) p.push(MESES[+f.month-1]);
+  p.push(f.year? f.year : "todo el período");
+  if(f.branch) p.push("· "+branchName(f.branch));
+  return p.join(" ");
+}
+function renderAll(){
+  renderScoreboard();
+  renderMap();
+  renderCharts();
+  renderRoster();
+  renderDetail();
+  const badge=document.getElementById("srcBadge"), txt=document.getElementById("srcTxt");
+  badge.className="src-badge "+(SRC==="live"?"live":SRC==="cache"?"cache":"fallback");
+  txt.textContent = SRC==="live"?"En vivo":SRC==="cache"?"Datos guardados":"Sin conexión";
+  document.getElementById("footSrc").textContent = SRC==="live"?"Conectado a la planilla en vivo":SRC==="cache"?"Mostrando última carga guardada":"Sin conexión con la planilla";
+}
+function renderScoreboard(){
+  document.getElementById("sbTotal").textContent=fmt(AGG.total);
+  document.getElementById("sbTotalLbl").textContent="Actividades · "+periodLabel();
+  const now=new Date(); const cm=now.getMonth()+1, cy=now.getFullYear();
+  const esteMes=ALL.filter(x=>x.fecha&&x.fecha.m===cm&&x.fecha.y===cy).length;
+  const sucAct=BRANCHES.filter(b=>AGG.perBranch[b.code]>0).length;
+  const jefAct=AGG.rosterAgg.filter(r=>r.total>0).length;
+  const rosterTotal=ROSTER_BASE.length;
+  const colab=Object.keys(AGG.perPerson).length;
+  const prom= sucAct? Math.round(AGG.total/ (BRANCHES.length) ) : 0;
+  const items=[
+    {v:fmt(esteMes), k:"Registradas este mes ("+MESES[cm-1].slice(0,3)+" "+cy+")"},
+    {v:sucAct+" / "+BRANCHES.length, k:"Sucursales con actividad"},
+    {v:jefAct+" / "+rosterTotal, k:"Jefaturas con actividad"},
+    {v:fmt(colab), k:"Colaboradores participantes"},
+    {v:fmt(prom), k:"Promedio por sucursal"},
+    {v:AGG.lastAll?AGG.lastAll.txt:"—", k:"Última actividad"},
+  ];
+  document.getElementById("sbGrid").innerHTML=items.map(x=>`<div class="sb-item"><div class="v">${x.v}</div><div class="k">${x.k}</div></div>`).join("");
+}
+
+/* ---- detalle por sucursal (mapa) ---- */
+function branchDetail(code){
+  const recs=VIEW.filter(x=>x.code===code);
+  const byType={}; recs.forEach(x=>byType[x.cat]=(byType[x.cat]||0)+1);
+  const topType=Object.entries(byType).sort((a,b)=>b[1]-a[1])[0];
+  const byPerson={}; recs.forEach(x=>byPerson[x.nombre]=(byPerson[x.nombre]||0)+1);
+  const topPeople=Object.entries(byPerson).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  let last=null; recs.forEach(x=>{const k=sortKey(x.fecha);if(x.fecha&&(!last||k>last.key))last={key:k,txt:x.fechaTxt};});
+  return {n:recs.length, topType, topPeople, last};
+}
+function showBranch(code){
+  document.querySelectorAll("#chileMap .mk").forEach(g=>g.classList.toggle("active",g.dataset.code===code));
+  const b=BRANCH_BY_CODE[code];
+  document.getElementById("dName").textContent=b.name+" · "+code;
+  document.getElementById("dHint").textContent="Actividades · "+periodLabel();
+  const d=branchDetail(code);
+  const grid=[
+    {dv:fmt(d.n), dk:"Actividades registradas"},
+    {dv:d.topType?CAT_LABEL[d.topType[0]]:"—", dk:"Tipo más frecuente"},
+    {dv:d.last?d.last.txt:"—", dk:"Última actividad"},
+  ];
+  document.getElementById("dGrid").innerHTML = d.n
+    ? grid.map(r=>`<div class="d-item"><div class="dv" style="font-size:${String(r.dv).length>10?'14px':'20px'}">${r.dv}</div><div class="dk">${r.dk}</div></div>`).join("")
+    : '<div class="d-empty">Sin actividades en este período</div>';
+  const list=document.getElementById("dList");
+  if(d.n && d.topPeople.length){
+    list.innerHTML=`<div class="dl-t">Quiénes registraron actividades</div>`+
+      d.topPeople.map(p=>`<div class="dl-row"><span>${p[0]}</span><b>${p[1]}</b></div>`).join("");
+  }else list.innerHTML="";
+}
+function renderMap(){
+  const svg=document.getElementById("chileMap");
+  const LAT0=17.6, SY=580/38.3, SX=SY*0.7986, LON0=-75.8, TOP=20;
+  const px=lon=>(lon-LON0)*SX+8, py=lat=>(lat-LAT0)*SY+TOP;
+  const CONT="M99.7,79.0 L104.4,99.9 L113.1,97.8 L114.6,101.6 L110.5,117.3 L97.3,124.8 L97.7,150.0 L95.1,154.9 L98.8,160.8 L90.2,170.2 L82.3,184.4 L78.0,198.2 L79.1,212.9 L71.7,228.5 L77.2,254.6 L80.4,257.4 L80.4,271.3 L73.5,286.1 L73.7,298.7 L64.6,308.6 L64.6,322.5 L68.3,337.3 L61.1,342.8 L57.8,356.3 L55.0,371.8 L57.0,390.3 L52.2,393.4 L55.0,410.8 L60.4,416.6 L56.5,422.9 L62.1,426.0 L63.4,431.7 L58.1,434.5 L59.4,443.4 L55.0,463.5 L48.5,476.4 L50.0,484.1 L46.1,493.7 L36.8,500.3 L37.9,516.4 L42.2,521.9 L50.2,520.9 L50.0,532.2 L55.0,541.1 L84.2,543.1 L95.4,545.5 L84.7,545.4 L78.8,549.1 L67.9,554.6 L66.0,568.7 L60.9,569.1 L47.2,564.1 L33.4,553.6 L18.3,544.9 L14.5,535.3 L18.0,526.5 L11.9,516.4 L10.3,490.6 L15.5,476.0 L28.2,464.3 L9.9,459.9 L21.4,446.5 L25.5,421.4 L39.0,426.7 L45.3,395.3 L37.2,391.3 L33.4,410.2 L25.8,408.1 L29.6,386.4 L33.7,358.3 L39.2,348.0 L35.7,333.2 L34.8,316.2 L39.8,315.7 L47.3,291.2 L55.6,267.0 L60.7,244.4 L58.0,221.7 L61.6,209.2 L60.1,190.5 L67.2,172.0 L69.4,142.8 L73.3,111.3 L77.0,77.4 L76.2,52.7 L73.6,31.3 L79.9,27.5 L83.1,19.7 L89.0,30.0 L90.6,40.9 L97.0,47.3 L93.2,62.0 Z";
+  const TDF="M94.7,550.6 L94.7,584.4 L107.6,584.4 L114.9,584.8 L110.9,590.9 L100.5,595.6 L94.6,595.2 L87.4,593.9 L78.7,589.4 L66.0,587.2 L50.8,578.7 L38.4,570.6 L21.8,553.6 L31.7,556.8 L48.7,566.9 L64.7,572.4 L71.0,565.4 L74.9,555.0 L86.1,548.8 Z";
+  const marks=BRANCHES.map(b=>({b,x:px(b.lon)+(b.offset?9:0),y:py(b.lat)+(b.offset?11:0)}));
+  const GAP=44,LX=170,ELX=148;
+  const sorted=[...marks].sort((a,c)=>a.y-c.y);
+  let prev=-Infinity; sorted.forEach(m=>{m.ly=Math.max(m.y,prev+GAP);prev=m.ly;});
+  const over=prev-625; if(over>0) sorted.forEach(m=>m.ly-=over*(m.ly-sorted[0].ly)/(prev-sorted[0].ly||1));
+  let html=`<path class="chile-shape" d="${CONT}"/><path class="chile-shape" d="${TDF}"/>`;
+  sorted.forEach(m=>{
+    const n=AGG.perBranch[m.b.code]||0;
+    html+=`<g class="mk" data-code="${m.b.code}">
+      <polyline points="${m.x+8},${m.y} ${ELX},${m.y} ${LX-8},${m.ly} ${LX-2},${m.ly}" fill="none"/>
+      <circle class="halo" cx="${m.x}" cy="${m.y}" r="${Math.min(22,10+n*0.25)}"/>
+      <circle class="pt" cx="${m.x}" cy="${m.y}" r="5.5"/>
+      <text x="${LX}" y="${m.ly-1}">${m.b.name}</text>
+      <text class="n" x="${LX}" y="${m.ly+13}">${n} ${n===1?"actividad":"actividades"}</text>
+    </g>`;
+  });
+  svg.innerHTML=html;
+  svg.querySelectorAll(".mk").forEach(g=>{
+    const code=g.dataset.code;
+    g.addEventListener("mouseenter",()=>showBranch(code));
+    g.addEventListener("click",()=>showBranch(code));
+  });
+}
+
+/* ---- gráficos ---- */
+function renderCharts(){
+  // por sucursal
+  const bl=BRANCHES.map(b=>b.name), bv=BRANCHES.map(b=>AGG.perBranch[b.code]||0);
+  makeChart("chBranch",{type:"bar",data:{labels:bl,datasets:[{data:bv,backgroundColor:PALETTE,borderRadius:5,datalabels:DL_BAR}]},options:commonOpts});
+
+  // por mes o por año
+  const f=currentFilters();
+  const mt=document.getElementById("chMonthTitle");
+  if(f.year){
+    mt.textContent="Actividades por mes · "+f.year;
+    makeChart("chMonth",{type:"bar",data:{labels:MESES.map(m=>m.slice(0,3)),datasets:[{data:AGG.perMonth,backgroundColor:"#00558C",borderRadius:4,datalabels:DL_BAR}]},options:commonOpts});
+  }else{
+    mt.textContent="Actividades por año";
+    const yrs=Object.keys(AGG.perYear).sort();
+    makeChart("chMonth",{type:"bar",data:{labels:yrs,datasets:[{data:yrs.map(y=>AGG.perYear[y]),backgroundColor:"#00558C",borderRadius:4,datalabels:DL_BAR}]},options:commonOpts});
+  }
+
+  // tipos
+  const tEntries=Object.keys(CAT_LABEL).map(k=>[k,AGG.perType[k]||0]).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]);
+  makeChart("chType",{type:"doughnut",data:{labels:tEntries.map(e=>CAT_LABEL[e[0]]),datasets:[{data:tEntries.map(e=>e[1]),backgroundColor:tEntries.map(e=>CAT_COLOR[e[0]]),borderWidth:2,borderColor:"#fff",datalabels:DL_DONUT}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:"55%",plugins:{legend:{position:"right",labels:{boxWidth:11,font:{size:11}}}}}});
+
+  // top personas
+  const people=Object.values(AGG.perPerson).sort((a,b)=>b.total-a.total).slice(0,10);
+  makeChart("chPeople",{type:"bar",data:{labels:people.map(p=>p.nombre),datasets:[{data:people.map(p=>p.total),backgroundColor:"#25A3BA",borderRadius:4,datalabels:DL_BARH}]},
+    options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}}}}});
+}
+
+/* ---- roster ---- */
+function renderRoster(){
+  const rows=[...AGG.rosterAgg];
+  const withAct=rows.filter(r=>r.total>0).length;
+  const totalJef=rows.reduce((a,r)=>a+r.total,0);
+  document.getElementById("rosterSub").textContent=
+    `${withAct} de ${ROSTER_BASE.length} cargos con actividad · ${totalJef} actividades del equipo de jefaturas · ${periodLabel()}`;
+  const maxT=Math.max(1,...rows.map(r=>r.total));
+  // orden: con actividad primero (desc), luego blancos/vacíos al final
+  rows.sort((a,b)=> (b.total-a.total) || (a.blank?1:0)-(b.blank?1:0) );
+  const body=document.getElementById("rosterBody");
+  body.innerHTML=rows.map(r=>{
+    const brs=Object.entries(r.byBranch).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1])
+      .map(e=>`<span class="pill b" title="${branchName(e[0])}">${e[0]} ${e[1]}</span>`).join(" ");
+    const nameHtml = r.nombre
+      ? `<span class="name-cell"><span data-nm>${r.nombre}</span><span class="edit-ico" onclick="editName(this,'${encodeURIComponent(r.cargo)}')">✎</span></span>`
+      : `<span class="name-cell"><input class="name-edit" placeholder="Agregar nombre…" onkeydown="if(event.key==='Enter')this.nextElementSibling.click()"><button class="mini-btn" onclick="commitName(this,'${encodeURIComponent(r.cargo)}')">Guardar</button></span>`;
+    const barW=Math.round(r.total/maxT*90);
+    const cls=(r.blank&&!r.nombre)?"row-blank":(r.total===0?"row-zero":"");
+    return `<tr class="${cls}">
+      <td>${r.cargo}</td>
+      <td>${nameHtml}</td>
+      <td class="num"><b>${r.total}</b></td>
+      <td><div class="bar-cell">${r.total?`<div class="bar" style="width:${Math.max(barW,6)}px"></div>`:""}${brs||'<span class="cargo-badge">—</span>'}</div></td>
+      <td>${r.last?r.last.txt:'<span class="cargo-badge">Sin registro</span>'}</td>
+    </tr>`;
+  }).join("");
+}
+function editName(ico,cargoEnc){
+  const cargo=decodeURIComponent(cargoEnc);
+  const cell=ico.closest("td");
+  const cur=cell.querySelector("[data-nm]").textContent;
+  cell.innerHTML=`<span class="name-cell"><input class="name-edit" value="${cur.replace(/"/g,'&quot;')}" onkeydown="if(event.key==='Enter')this.nextElementSibling.click()"><button class="mini-btn" onclick="commitName(this,'${cargoEnc}')">Guardar</button><button class="mini-btn g" onclick="applyFilters()">✕</button></span>`;
+  cell.querySelector("input").focus();
+}
+function commitName(btn,cargoEnc){
+  const cargo=decodeURIComponent(cargoEnc);
+  const val=btn.parentElement.querySelector("input").value.trim();
+  saveOverride(cargo,val);
+  applyFilters();
+}
+
+/* ---- detalle ---- */
+let detSort={k:"fecha",dir:-1};
+function renderDetail(){
+  const q=norm(document.getElementById("fSearch").value);
+  let rows=VIEW.filter(x=> !q || norm(x.nombre+" "+x.actividad+" "+x.desc+" "+x.obs+" "+x.sucursal).includes(q));
+  rows=[...rows].sort((a,b)=>{
+    let av,bv;
+    if(detSort.k==="fecha"){ av=sortKey(a.fecha); bv=sortKey(b.fecha); }
+    else{ av=norm(a[detSort.k]); bv=norm(b[detSort.k]); }
+    if(av<bv) return -1*detSort.dir; if(av>bv) return 1*detSort.dir; return 0;
+  });
+  document.getElementById("detSub").textContent=`${rows.length} actividad(es) · ${periodLabel()}`;
+  const body=document.getElementById("detBody");
+  body.innerHTML=rows.map((x,i)=>{
+    const img=x.img?`<a class="lnk" href="${x.img}" target="_blank" rel="noopener">📎 abrir</a>`:'<span class="cargo-badge">—</span>';
+    return `<tr>
+      <td style="white-space:nowrap">${x.fechaTxt||"—"}</td>
+      <td><span class="pill b">${x.code}</span> ${x.sucursal}</td>
+      <td>${x.nombre||"—"}</td>
+      <td>${x.actividad||"—"}</td>
+      <td><span class="pill" style="background:${CAT_COLOR[x.cat]}22;color:${CAT_COLOR[x.cat]}">${CAT_LABEL[x.cat]}</span></td>
+      <td><span class="expand" onclick="toggleRow(this)">ver ▾</span></td>
+    </tr>
+    <tr style="display:none"><td colspan="6" class="det-row-sub">
+      <div><span class="lab">Descripción</span>${x.desc||"—"}</div>
+      ${x.obs?`<div style="margin-top:4px"><span class="lab">Observaciones y acuerdos</span>${x.obs}</div>`:""}
+      ${x.img?`<div style="margin-top:4px"><span class="lab">Evidencia</span>${img}</div>`:""}
+    </td></tr>`;
+  }).join("");
+}
+function toggleRow(el){
+  const tr=el.closest("tr"); const sub=tr.nextElementSibling;
+  const open=sub.style.display!=="none";
+  sub.style.display=open?"none":"table-row";
+  el.textContent=open?"ver ▾":"ocultar ▴";
+}
+document.getElementById("detTbl").querySelectorAll("thead th[data-k]").forEach(th=>{
+  th.addEventListener("click",()=>{ const k=th.dataset.k; detSort.dir = detSort.k===k? -detSort.dir : (k==="fecha"?-1:1); detSort.k=k; renderDetail(); });
+});
+function exportCsv(){
+  const q=norm(document.getElementById("fSearch").value);
+  const rows=VIEW.filter(x=> !q || norm(x.nombre+" "+x.actividad+" "+x.desc+" "+x.obs+" "+x.sucursal).includes(q));
+  const head=["Fecha","Sucursal (código)","Sucursal","Persona","Actividad","Tipo","Descripción","Observaciones","Evidencia"];
+  const esc=s=>`"${String(s??"").replace(/"/g,'""')}"`;
+  const csv=[head.join(",")].concat(rows.map(x=>[x.fechaTxt,x.code,x.sucursal,x.nombre,x.actividad,CAT_LABEL[x.cat],x.desc,x.obs,x.img].map(esc).join(","))).join("\r\n");
+  const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="Actividades_Liderazgo_"+periodLabel().replace(/[^\wáéíóúñ]+/gi,"_")+".csv";
+  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},800);
+}
+
+/* ===================== INFORME WORD ===================== */
+function canvasPng(id){
+  const cv=document.getElementById(id); if(!cv) return null;
+  const tmp=document.createElement("canvas"); tmp.width=cv.width; tmp.height=cv.height;
+  const ctx=tmp.getContext("2d"); ctx.fillStyle="#fff"; ctx.fillRect(0,0,tmp.width,tmp.height); ctx.drawImage(cv,0,0);
+  return tmp.toDataURL("image/png").split(",")[1];
+}
+function wrap76(b){ return b.replace(/(.{76})/g,"$1\r\n"); }
+function genWord(){
+  if(!AGG){ alert("Aún no hay datos cargados."); return; }
+  const per=periodLabel();
+  const brRows=BRANCHES.map(b=>`<tr><td>${b.name} (${b.code})</td><td style="text-align:right">${AGG.perBranch[b.code]||0}</td></tr>`).join("");
+  const roster=[...AGG.rosterAgg].sort((a,b)=>b.total-a.total);
+  const rosRows=roster.map(r=>`<tr><td>${r.cargo}</td><td>${r.nombre||"<i>(sin asignar)</i>"}</td><td style="text-align:right">${r.total}</td><td>${r.last?r.last.txt:"—"}</td></tr>`).join("");
+  const tEntries=Object.keys(CAT_LABEL).map(k=>[k,AGG.perType[k]||0]).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]);
+  const tipRows=tEntries.map(e=>`<tr><td>${CAT_LABEL[e[0]]}</td><td style="text-align:right">${e[1]}</td></tr>`).join("");
+  const chartDefs=[{id:"chBranch",t:"Actividades por sucursal"},{id:"chMonth",t:document.getElementById("chMonthTitle").textContent},{id:"chType",t:"Tipo de actividad"},{id:"chPeople",t:"Colaboradores más activos"}];
+  const images=[]; chartDefs.forEach((c,i)=>{const b=canvasPng(c.id); if(b) images.push({name:`c${i}.png`,t:c.t,b});});
+  const imgsHtml=images.map(im=>`<p style="margin:12pt 0 3pt"><b>${im.t}</b></p><p><img src="${im.name}" width="560"></p>`).join("");
+  const today=new Date();
+  const fecha=`${MESES[today.getMonth()]} ${today.getDate()} de ${today.getFullYear()}`;
+  const withAct=roster.filter(r=>r.total>0).length;
+  const body=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" lang="es">
+  <head><meta charset="utf-8"><title>Actividades de Liderazgo Preventivo</title>
+  <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+  <style>@page{size:21.59cm 27.94cm;margin:2.2cm}
+  body{font-family:Arial,sans-serif;font-size:11pt;color:#1E1E1E;line-height:1.35}
+  h1{font-size:16pt;color:#AA0020;text-align:center;margin:0 0 2pt}
+  .fecha{text-align:center;font-weight:bold;margin:0 0 14pt}
+  h2{font-size:13pt;color:#AA0020;border-bottom:1.5pt solid #AA0020;padding-bottom:2pt;margin:16pt 0 8pt}
+  table{border-collapse:collapse;width:100%;font-size:10pt;margin:4pt 0}
+  th,td{border:0.5pt solid #C8C8C8;padding:4pt 7pt;text-align:left}
+  th{background:#F0E4E6;color:#7E0018}
+  .brandbar{background:#AA0020;color:#fff;padding:8pt 12pt;font-weight:bold;font-size:12pt;margin-bottom:14pt}
+  .firma{margin-top:26pt;font-weight:bold}</style></head><body>
+  <div class="brandbar">Linde High Lift Chile S.A.</div>
+  <h1>Actividades de Liderazgo Preventivo SSOMA</h1>
+  <p class="fecha">Período: ${per}</p>
+  <h2>1. Resumen general</h2>
+  <p>Se registran <b>${AGG.total}</b> actividades de liderazgo preventivo en el período (${per}), realizadas por <b>${Object.keys(AGG.perPerson).length}</b> colaboradores. Del equipo de jefaturas, <b>${withAct} de ${ROSTER_BASE.length}</b> cargos registran al menos una actividad, sumando <b>${roster.reduce((a,r)=>a+r.total,0)}</b> actividades.</p>
+  <h2>2. Actividades por sucursal</h2>
+  <table><tr><th>Sucursal</th><th style="text-align:right">Actividades</th></tr>${brRows}<tr><td><b>Total</b></td><td style="text-align:right"><b>${AGG.total}</b></td></tr></table>
+  <h2>3. Actividades por tipo</h2>
+  <table><tr><th>Tipo de actividad</th><th style="text-align:right">Cantidad</th></tr>${tipRows}</table>
+  <h2>4. Cumplimiento por cargo (jefaturas)</h2>
+  <table><tr><th>Cargo</th><th>Nombre</th><th style="text-align:right">Act.</th><th>Última</th></tr>${rosRows}</table>
+  <h2>5. Anexo · Gráficos</h2>
+  ${imgsHtml}
+  <p class="firma">Elaborado por SSOMA — Linde High Lift Chile S.A.<br>${fecha}.</p>
+  </body></html>`;
+  const B="----=_NextPart_LLP_LINDE";
+  let mh="MIME-Version: 1.0\r\n"+`Content-Type: multipart/related; boundary="${B}"; type="text/html"\r\n\r\n`
+    +`--${B}\r\nContent-Type: text/html; charset="utf-8"\r\nContent-Location: doc.htm\r\n\r\n`+body+"\r\n\r\n";
+  images.forEach(im=>{ mh+=`--${B}\r\nContent-Type: image/png\r\nContent-Transfer-Encoding: base64\r\nContent-Location: ${im.name}\r\n\r\n`+wrap76(im.b)+"\r\n\r\n"; });
+  mh+=`--${B}--`;
+  const blob=new Blob([mh],{type:"application/msword"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="Actividades_Liderazgo_"+per.replace(/[^\wáéíóúñ]+/gi,"_")+".doc";
+  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+}
+
+/* ===================== CARGA DE DATOS ===================== */
+async function fetchCsv(){
+  const bust="t="+Date.now();
+  const sep=PUB_CSV.includes("?")?"&":"?";
+  const target=PUB_CSV+sep+bust;
+  const vias=[
+    {name:"directa", u:target},
+    {name:"allorigins", u:"https://api.allorigins.win/raw?url="+encodeURIComponent(target)},
+    {name:"corsproxy", u:"https://corsproxy.io/?url="+encodeURIComponent(target)},
+    {name:"codetabs", u:"https://api.codetabs.com/v1/proxy/?quest="+encodeURIComponent(target)},
+  ];
+  const fails=[];
+  for(const v of vias){
+    try{
+      const res=await fetch(v.u,{cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      const text=await res.text();
+      if(text.trim().startsWith("<")) throw new Error("respuesta HTML");
+      if(!norm(text).includes("sucursal")) throw new Error("sin encabezados esperados");
+      return text;
+    }catch(e){ fails.push(v.name+": "+e.message); }
+  }
+  throw new Error(fails.join(" · "));
+}
+function initFiltersUI(){
+  const yrs=Object.keys(ALL.reduce((a,x)=>{if(x.fecha)a[x.fecha.y]=1;return a;},{})).sort();
+  const ys=document.getElementById("fYear");
+  ys.innerHTML=`<option value="">Todos</option>`+yrs.map(y=>`<option value="${y}">${y}</option>`).join("");
+  ys.value= yrs.length? yrs[yrs.length-1] : "";
+  const bs=document.getElementById("fBranch");
+  bs.innerHTML=`<option value="">Todas</option>`+BRANCHES.map(b=>`<option value="${b.code}">${b.name} (${b.code})</option>`).join("");
+}
+async function loadAll(){
+  const err=document.getElementById("err"); err.style.display="none";
+  let text=null, src=null, msgs=[];
+  try{ text=await fetchCsv(); src="live"; localStorage.setItem(CACHE_KEY, JSON.stringify({t:Date.now(),text})); }
+  catch(e){ msgs.push("No se pudo conectar con la planilla ("+e.message+")."); }
+  if(!text){
+    try{ const c=JSON.parse(localStorage.getItem(CACHE_KEY)||"null"); if(c&&c.text){ text=c.text; src="cache"; msgs.push("Mostrando la última carga guardada del "+new Date(c.t).toLocaleString("es-CL")+"."); } }catch(e){}
+  }
+  if(!text){
+    err.innerHTML="<b>Sin datos:</b><br>"+msgs.join("<br>")+"<br>Verifica que la planilla esté publicada como CSV y que tengas conexión.";
+    err.style.display="block";
+    document.getElementById("srcBadge").className="src-badge fallback";
+    document.getElementById("srcTxt").textContent="Sin conexión";
+    return;
+  }
+  const firstLoad = ALL.length===0;
+  ALL=toRecords(parseCSV(text));
+  SRC=src;
+  if(firstLoad) initFiltersUI();
+  document.getElementById("lastUpd").textContent="Actualizado "+new Date().toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit"});
+  if(msgs.length){ err.innerHTML="<b>Aviso:</b> "+msgs.join("<br>"); err.style.display="block"; }
+  applyFilters();
+  const first=VIEW.find(x=>x.code)||ALL[0];
+  if(first) showBranch(first.code);
+}
+loadAll();
+setInterval(loadAll, 5*60*1000);
+</script>
+</body>
+</html>
